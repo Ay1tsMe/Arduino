@@ -16,7 +16,7 @@
 #include "LiBoard.h"
 
 // Option 1 - Global Threshold (Applies to all photoresistors)
-const unsigned short THRESHOLD = 500;
+const unsigned short THRESHOLD = 100;
 
 // Option 2 - Per-square threshold (Applies to each individual photoresistor)
 /*
