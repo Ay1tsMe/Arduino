@@ -55,7 +55,6 @@ void setup() {
 }
 
 void loop() {
-
   currentBinBoard = board.getBinaryBoard(THRESHOLD);
   if (currentBinBoard != lastBinBoard) {
     writeBinaryBoard(currentBinBoard);
