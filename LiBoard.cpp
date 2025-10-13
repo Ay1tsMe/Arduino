@@ -60,7 +60,7 @@ void LiBoard::getData() {
 
 unsigned char LiBoard::getIndex(unsigned char file, unsigned char rank) {
     //Little-endian Rank-File Mapping
-    return (rank * 8) + file;
+    return ((7 - rank) * 8) + (7 - file);
 }
 
 unsigned long long LiBoard::getBinaryBoard(unsigned short threshold) {
@@ -68,6 +68,14 @@ unsigned long long LiBoard::getBinaryBoard(unsigned short threshold) {
 	unsigned long long binBoard = 0;
 	for (unsigned char i = 0; i<64; ++i)
 		binBoard |= (((unsigned long long) (values[i]<=threshold)) << i);
+	return binBoard;
+}
+
+unsigned long long LiBoard::getBinaryBoard(unsigned short *thresholds) {
+	getData();
+	unsigned long long binBoard = 0;
+	for (unsigned char i = 0; i<64; ++i)
+		binBoard |= (((unsigned long long) (values[i]<=thresholds[i])) << i);
 	return binBoard;
 }
 

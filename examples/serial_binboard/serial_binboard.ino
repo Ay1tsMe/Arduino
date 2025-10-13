@@ -15,7 +15,30 @@
 
 #include "LiBoard.h"
 
-const unsigned short THRESHOLD = 100;
+// Option 1 - Global Threshold (Applies to all photoresistors)
+const unsigned short THRESHOLD = 500;
+
+// Option 2 - Per-square threshold (Applies to each individual photoresistor)
+/*
+unsigned short THRESHOLD[64] = {
+  // A1..H1
+  150, 150, 150, 150, 150, 150, 150, 150,
+  // A2..H2
+  150, 150, 150, 150, 150, 150, 150, 150,
+  // A3..H3
+  100, 100, 100, 100, 100, 100, 100, 100,
+  // A4..H4
+  100, 100, 100, 100, 100, 100, 100, 100,
+  // A5..H5
+  600, 600, 600, 600, 600, 600, 600, 600,
+  // A6..H6
+  600, 600, 600, 600, 600, 600, 600, 600,
+  // A7..H7
+  300, 300, 300, 300, 300, 300, 300, 300,
+  // A8..H8
+  300, 300, 300, 300, 300, 300, 300, 300
+};
+*/
 
 LiBoard board = LiBoard();
 unsigned long long lastBinBoard = 0;
@@ -32,6 +55,7 @@ void setup() {
 }
 
 void loop() {
+
   currentBinBoard = board.getBinaryBoard(THRESHOLD);
   if (currentBinBoard != lastBinBoard) {
     writeBinaryBoard(currentBinBoard);
