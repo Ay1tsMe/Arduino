@@ -17,7 +17,7 @@
 #include <string.h>
 
 // !!! choose mode: 1 = global single value, 0 = per-square array !!!
-#define USE_GLOBAL_THRESHOLD 0
+#define USE_GLOBAL_THRESHOLD 1
 
 #if USE_GLOBAL_THRESHOLD 
 // Option 1 - Global Threshold (Applies to all photoresistors)
@@ -66,6 +66,21 @@ void printRawSnapshotCSV() {
   Serial.println();
 }
 
+// print current threshold values as CSV
+void printCurrentThreshold() {
+#if USE_GLOBAL_THRESHOLD
+  // Global Threshold - print one value
+   Serial.println(THRESHOLD);
+#else
+  // Individual Thresholds - print 64 values
+  for (int i = 0; i < 64; ++i) {
+    Serial.print(THRESHOLD[i]);
+    if (i < 63) Serial.print(',');
+  }
+  Serial.println();
+#endif
+}
+
 void setup() {
   delay(3000);
   Serial.begin(9600);
@@ -78,6 +93,11 @@ void loop() {
     // if host sends '?', reply with one CSV line of raw ADC values
     if (c == '?') {
       printRawSnapshotCSV();
+    }
+
+    // if host sends '!', reply with current threshold values
+    if (c == '!') {
+      printCurrentThreshold();
     }
 
     // Calibration Mode for editing THRESHOLD
