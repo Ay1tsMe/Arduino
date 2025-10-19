@@ -23,7 +23,7 @@ By default, Liboard is configured to use the Global threshold mode. If you want 
 Global Threshold mode applies the same threshold value to every photoresistor. If you need to change the sensitivity of the photoresistors, change the value of this variable:
 ```C
 // Option 1 - Global Threshold (Applies to all photoresistors)
-const unsigned short THRESHOLD = 100;
+unsigned short THRESHOLD = 100;
 ```
 
 ### Option 2 - Per-square Thresholds
