@@ -11,17 +11,23 @@ to run the `serial_binboard` sketch from the library's examples folder.
 ## Thresholds
 Each photoresistor requires a threshold value which triggers when each square is occupied or not. There are two options you can use to set the threshold values for each square.
 
-### Option 1 - Global Threshold
-By default, a global threshold is set for every phtooresistor. If you need to change the sensitivity of the photoresistors, change the value of this variable:
-```C
-// Option 1 - Global Threshold (Applies to all photoresistors)
-const unsigned short THRESHOLD = 500;
+### Setting Threshold Mode
+By default, Liboard is configured to use the Global threshold mode. If you want to change it Per-Square thresholds, then edit the following variable:
+
+``` C
+// !!! choose mode: 1 = global single value, 0 = per-square array !!!
+#define USE_GLOBAL_THRESHOLD 1
 ```
 
-### Option 2 - Per-square threshold
-If you require each photoresistor to have its own threshold rather than a global threshold, comment out Option 1 and uncomment Option 2. 
+### Option 1 - Global Threshold
+Global Threshold mode applies the same threshold value to every photoresistor. If you need to change the sensitivity of the photoresistors, change the value of this variable:
+```C
+// Option 1 - Global Threshold (Applies to all photoresistors)
+unsigned short THRESHOLD = 100;
+```
 
-You can adjust each square threshold individually by editing each number.
+### Option 2 - Per-square Thresholds
+You can also set individual thresholds for each photoresisor. This is useful if not all your photoresistors are the same type. Per-square thresholds also has more accuracy. You can adjust each square threshold individually by editing each number.
 ```C
 // Option 2 - Per-square threshold (Applies to each individual photoresistor)
 unsigned short THRESHOLD[64] = {
