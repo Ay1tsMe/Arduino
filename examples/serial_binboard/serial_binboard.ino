@@ -14,29 +14,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "LiBoard.h"
+#include <string.h>
 
+// !!! choose mode: 1 = global single value, 0 = per-square array !!!
+#define USE_GLOBAL_THRESHOLD 0
+
+#if USE_GLOBAL_THRESHOLD 
 // Option 1 - Global Threshold (Applies to all photoresistors)
 unsigned short THRESHOLD = 100;
 
+#else
 // Option 2 - Per-square threshold (Applies to each individual photoresistor)
-//unsigned short THRESHOLD[64] = {
-  // A1-A8
-//  387,  398,  424,  493,  361,  353,  501,  309,
-  // B1-B8
-//  416,  422,  412,  417,  483,  426,  353,  419,
-  // C1-C8
-//  288,  266,  297,  229,  298,  267,  269,  309,
-  // D1-D8
-//  311,  328,  287,  300,  290,  313,  255,  438,
-  // E1-E8
-//  675,  708,  724,  717,  706,  690,  783,  729,
-  // F1-F8
-//  708,  707,  707,  686,  719,  722,  710,  662,
-  // G1-G8
-//  555,  573,  590,  659,  581,  580,  643,  650,
-  // H1-H8
-//  504,  474,  490,  643,  623,  651,  526,  647,
-//};
+unsigned short THRESHOLD[64] = {
+  // A1-H1
+  10,  10,  10,  10,  361,  353,  501,  309,
+  // A2-H2
+  416,  422,  412,  417,  483,  426,  353,  419,
+  // A3-H3
+  288,  266,  297,  229,  298,  267,  269,  309,
+  // A4-H4
+  311,  328,  287,  300,  290,  313,  255,  438,
+  // A5-H5
+  675,  708,  724,  717,  706,  690,  783,  729,
+  // A6-H6
+  708,  707,  707,  686,  719,  722,  710,  662,
+  // A7-H7
+  555,  573,  590,  659,  581,  580,  643,  650,
+  // A8-H8
+  504,  474,  490,  643,  623,  651,  526,  10,
+};
+#endif
 
 bool calibrating = false;
 
@@ -65,6 +72,7 @@ void setup() {
 }
 
 void loop() {
+  // Serial Monitor arguements
   if (Serial.available()) {
     int c = Serial.read();
     // if host sends '?', reply with one CSV line of raw ADC values
@@ -72,6 +80,7 @@ void loop() {
       printRawSnapshotCSV();
     }
 
+    // Calibration Mode for editing THRESHOLD
     if (c == 'c') {
       calibrating = true;
       Serial.println("Calibration Mode Activated!");
@@ -79,22 +88,35 @@ void loop() {
 
     while (calibrating) {
       if (Serial.available()){
-        int p = Serial.peek();
-        if (isDigit(p)) {
-          int newValue = Serial.parseInt();
-          THRESHOLD = newValue;
-          Serial.print("THRESHOLD is now: ");
-          Serial.println(THRESHOLD);
-          calibrating = false;
+        // read a whole line the user pasted
+        String line = Serial.readStringUntil('\n');
+        line.trim();
+        if (line.length() == 0) continue;
+
+#if USE_GLOBAL_THRESHOLD        
+        // Global Threshold Calibration
+        long newThreshold = line.toInt();
+        THRESHOLD = (unsigned short)newThreshold;
+#else
+        // Per-Square Calibration
+        char buf[1024];
+        line.toCharArray(buf, 1024);
+        char* tok = strtok(buf, ",");
+
+        int i = 0;
+        while (tok && i < 64) {
+          THRESHOLD[i++] = (unsigned short)atoi(tok);
+          tok = strtok(nullptr, ",");
         }
+#endif
+        calibrating = false;
         // eat non-numeric to avoid getting stuck
-        else {
-          Serial.read();
-        }
+        while (Serial.available()) Serial.read();
       }
     }
   }
 
+  // Bitboard logic for normal use
   currentBinBoard = board.getBinaryBoard(THRESHOLD);
   if (currentBinBoard != lastBinBoard) {
     writeBinaryBoard(currentBinBoard);
