@@ -17,7 +17,7 @@
 #include <string.h>
 
 // !!! choose mode: 1 = global single value, 0 = per-square array !!!
-#define USE_GLOBAL_THRESHOLD 1
+#define USE_GLOBAL_THRESHOLD 0
 
 #if USE_GLOBAL_THRESHOLD 
 // Option 1 - Global Threshold (Applies to all photoresistors)
@@ -27,9 +27,9 @@ unsigned short THRESHOLD = 100;
 // Option 2 - Per-square threshold (Applies to each individual photoresistor)
 unsigned short THRESHOLD[64] = {
   // A1..H1
-  150, 150, 150, 150, 150, 150, 150, 150,
+  300, 300, 300, 300, 300, 300, 300, 300,
   // A2..H2
-  150, 150, 150, 150, 150, 150, 150, 150,
+  300, 300, 300, 300, 300, 300, 300, 300,
   // A3..H3
   100, 100, 100, 100, 100, 100, 100, 100,
   // A4..H4
@@ -46,6 +46,7 @@ unsigned short THRESHOLD[64] = {
 #endif
 
 bool calibrating = false;
+bool quiet = false;
 
 LiBoard board = LiBoard();
 unsigned long long lastBinBoard = 0;
@@ -100,6 +101,16 @@ void loop() {
       printCurrentThreshold();
     }
 
+    // Toggle quiet mode (Used to silence bitboard output)
+    if (c == 'q' && quiet == false) {
+      quiet = true;
+      Serial.println("Quiet Mode Activated!");
+    }
+    else if (c == 'q' && quiet == true) {
+      quiet = false;
+      Serial.println("Exited Quiet Mode!");
+    }
+
     // Calibration Mode for editing THRESHOLD
     if (c == 'c') {
       calibrating = true;
@@ -137,9 +148,11 @@ void loop() {
   }
 
   // Bitboard logic for normal use
-  currentBinBoard = board.getBinaryBoard(THRESHOLD);
-  if (currentBinBoard != lastBinBoard) {
-    writeBinaryBoard(currentBinBoard);
-    lastBinBoard = currentBinBoard;
+  if (!quiet && !calibrating) {
+    currentBinBoard = board.getBinaryBoard(THRESHOLD);
+    if (currentBinBoard != lastBinBoard) {
+      writeBinaryBoard(currentBinBoard);
+      lastBinBoard = currentBinBoard;
+    }
   }
 }
